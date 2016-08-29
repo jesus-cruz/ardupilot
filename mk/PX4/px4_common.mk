@@ -29,6 +29,7 @@ MODULES		+= drivers/trone
 #MODULES	+= drivers/hott_telemetry
 #MODULES	+= drivers/blinkm
 #MODULES	+= modules/sensors
+MODULES        += modules/serialDemo
 MODULES		+= drivers/airspeed
 MODULES		+= drivers/ets_airspeed
 MODULES		+= drivers/meas_airspeed
