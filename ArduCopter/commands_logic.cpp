@@ -23,6 +23,10 @@ bool Copter::start_command(const AP_Mission::Mission_Command& cmd)
         do_nav_wp(cmd);
         break;
 
+    case MAV_CMD_NAV_WAYPOINT_DROP_PACKET:
+        do_nav_wp_pk(cmd);
+        break;
+
     case MAV_CMD_NAV_LAND:              // 21 LAND to Waypoint
         do_land(cmd);
         break;
@@ -86,16 +90,16 @@ bool Copter::start_command(const AP_Mission::Mission_Command& cmd)
     case MAV_CMD_DO_SET_SERVO:
         ServoRelayEvents.do_set_servo(cmd.content.servo.channel, cmd.content.servo.pwm);
         break;
-        
+
     case MAV_CMD_DO_SET_RELAY:
         ServoRelayEvents.do_set_relay(cmd.content.relay.num, cmd.content.relay.state);
         break;
-        
+
     case MAV_CMD_DO_REPEAT_SERVO:
         ServoRelayEvents.do_repeat_servo(cmd.content.repeat_servo.channel, cmd.content.repeat_servo.pwm,
                                          cmd.content.repeat_servo.repeat_count, cmd.content.repeat_servo.cycle_time * 1000.0f);
         break;
-        
+
     case MAV_CMD_DO_REPEAT_RELAY:
         ServoRelayEvents.do_repeat_relay(cmd.content.repeat_relay.num, cmd.content.repeat_relay.repeat_count,
                                          cmd.content.repeat_relay.cycle_time * 1000.0f);
@@ -192,6 +196,9 @@ bool Copter::verify_command(const AP_Mission::Mission_Command& cmd)
 
     case MAV_CMD_NAV_WAYPOINT:
         return verify_nav_wp(cmd);
+
+    case MAV_CMD_NAV_WAYPOINT_DROP_PACKET:
+        return verify_nav_wp_pk(cmd);
 
     case MAV_CMD_NAV_LAND:
         return verify_land();
@@ -292,6 +299,25 @@ void Copter::do_takeoff(const AP_Mission::Mission_Command& cmd)
 
 // do_nav_wp - initiate move to next waypoint
 void Copter::do_nav_wp(const AP_Mission::Mission_Command& cmd)
+{
+    const Vector3f &curr_pos = inertial_nav.get_position();
+    const Vector3f local_pos = pv_location_to_vector_with_default(cmd.content.location, curr_pos);
+
+    // this will be used to remember the time in millis after we reach or pass the WP.
+    loiter_time = 0;
+    // this is the delay, stored in seconds
+    loiter_time_max = abs(cmd.p1);
+
+    // Set wp navigation target
+    auto_wp_start(local_pos);
+    // if no delay set the waypoint as "fast"
+    if (loiter_time_max == 0 ) {
+        wp_nav.set_fast_waypoint(true);
+    }
+}
+
+// do_nav_wp - initiate move to next waypoint
+void Copter::do_nav_wp_pk(const AP_Mission::Mission_Command& cmd)
 {
     const Vector3f &curr_pos = inertial_nav.get_position();
     const Vector3f local_pos = pv_location_to_vector_with_default(cmd.content.location, curr_pos);
@@ -607,6 +633,33 @@ bool Copter::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
     if(loiter_time == 0) {
         loiter_time = millis();
     }
+
+    // check if timer has run out
+    if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
+        gcs_send_text_fmt(PSTR("Reached Command #%i"),cmd.index);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+// verify_nav_wp - check if we have reached the next way point
+bool Copter::verify_nav_wp_pk(const AP_Mission::Mission_Command& cmd)
+{
+    // check if we have reached the waypoint
+    if( !wp_nav.reached_wp_destination() ) {
+        return false;
+    }
+
+    // play a tone
+    AP_Notify::events.waypoint_complete = 1;
+
+    // start timer if necessary
+    if(loiter_time == 0) {
+        loiter_time = millis();
+    }
+
+    // Drop the packet
 
     // check if timer has run out
     if (((millis() - loiter_time) / 1000) >= loiter_time_max) {

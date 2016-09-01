@@ -558,6 +558,16 @@
                     <param index="6">Longitude</param>
                     <param index="7">Altitude</param>
                </entry>
+               <entry value="244" name="MAV_CMD_NAV_WAYPOINT_DROP_PACKET">
+                    <description>Drop the packet.</description>
+                    <param index="1">Hold time in decimal seconds. (ignored by fixed wing, time to stay at MISSION for rotary wing)</param>
+                    <param index="2">Acceptance radius in meters (if the sphere with this radius is hit, the MISSION counts as reached)</param>
+                    <param index="3">0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.</param>
+                    <param index="4">Desired yaw angle at MISSION (rotary wing)</param>
+                    <param index="5">Latitude</param>
+                    <param index="6">Longitude</param>
+                    <param index="7">Altitude</param>
+               </entry>
                <entry value="17" name="MAV_CMD_NAV_LOITER_UNLIM">
                     <description>Loiter around this MISSION an unlimited amount of time</description>
                     <param index="1">Empty</param>
