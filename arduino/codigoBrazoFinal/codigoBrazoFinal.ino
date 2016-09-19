@@ -19,7 +19,7 @@
 
 #include <Servo.h>                   // Clase Servo        
 
-Servo superior;
+Servo superior; 
 Servo medio;
 Servo inferior;
 Servo amarre;
