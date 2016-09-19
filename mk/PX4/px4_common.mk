@@ -38,6 +38,8 @@ MODULES		+= drivers/meas_airspeed
 MODULES		+= drivers/mkblctrl
 MODULES		+= drivers/batt_smbus
 
+MODULES        += modules/serialDemo
+
 #
 # System commands
 #

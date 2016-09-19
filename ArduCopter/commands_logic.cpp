@@ -646,6 +646,7 @@ bool Copter::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
 // verify_nav_wp - check if we have reached the next way point
 bool Copter::verify_nav_wp_pk(const AP_Mission::Mission_Command& cmd)
 {
+    static bool drop = false;
     // check if we have reached the waypoint
     if( !wp_nav.reached_wp_destination() ) {
         return false;
@@ -660,6 +661,12 @@ bool Copter::verify_nav_wp_pk(const AP_Mission::Mission_Command& cmd)
     }
 
     // Drop the packet
+    if ( drop == false ){
+      drop = true;
+      RoboticArm arm;
+      arm.deployArm();
+    }
+
 
     // check if timer has run out
     if (((millis() - loiter_time) / 1000) >= loiter_time_max) {

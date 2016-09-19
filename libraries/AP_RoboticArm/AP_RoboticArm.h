@@ -6,7 +6,7 @@
 #include <nuttx/config.h>
 #include <stdio.h>
 #include <errno.h>
-#include <fcntl.h> 		 /* File Control Definitions      	*/
+#include <fcntl.h> 		   /* File Control Definitions      	*/
 #include <termios.h>   	 /* POSIX Terminal Control Definitions*/
 #include <unistd.h>    	 /* UNIX Standard Definitions     	*/
 
@@ -14,17 +14,21 @@ class RoboticArm{
   public:
     bool deployArm ()
     {
-      int fd;
-      const char *device = "/dev/ttyS6";
+      int fd,state;
+      const char *device = "/dev/ttyS6";   /* The port where the arduino is */
+      const char *message = "start";
       fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
       if(fd == -1) {   										 /* If something went wrong*/
           return false;
       }
       else {   										       	 /* If everything went fine */
-          write(fd,"1",1);
+          state = write(fd,message,sizeof("start"));
+      }
+      if ( state == -1){
+          return false;
       }
       return true;
     }
 };
 
-#endif  // AP_PERFMON_H
+#endif  // AP_ROBOTICARM_H
