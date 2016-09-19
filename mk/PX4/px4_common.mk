@@ -38,7 +38,8 @@ MODULES		+= drivers/meas_airspeed
 MODULES		+= drivers/mkblctrl
 MODULES		+= drivers/batt_smbus
 
-MODULES        += modules/serialDemo
+# serialDemo module,used to test the serial port, it's nothing to be proud of 
+# MODULES        += modules/serialDemo
 
 #
 # System commands
