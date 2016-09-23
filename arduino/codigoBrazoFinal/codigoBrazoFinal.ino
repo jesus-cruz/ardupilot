@@ -19,7 +19,7 @@
 
 #include <Servo.h>                   // Clase Servo        
 
-Servo superior; 
+Servo superior;
 Servo medio;
 Servo inferior;
 Servo amarre;
@@ -28,10 +28,10 @@ long mensaje;                       //Mensaje recibido por el serial
 
 //Ángulos calculados para los movimientos, si cambian modificarlos aquí:
 const int pinzaAbrir = 60;          // Ángulo de apertura de la pinza.
-const int pinzaCerrar = 7;          
+const int pinzaCerrar = 40;          
 const int desplegarSuperior = 80;   // Ángulo para el servo superior al desplegar.
 const int desplegarInferior = 125;
-const int recogerSuperior = 50; 
+const int recogerSuperior = 60; 
 const int recogerInferior = 20;
 const int fijoMedio = 60;           // Ángulo para el servo medio, es fijo.
 
@@ -49,7 +49,12 @@ void setup()
     inferior.attach(5);             //servo inferior pin 5 
     amarre.attach(11);              //servo amarre pin 11 pinza
 
+    
     medio.write(60);                //este motor no se usa en los movimientos actuales
+    // Debemos escribir unos valores iniciales para evitar posibles errores al usar servo.read();
+    inferior.write(20);
+    superior.write(60);
+    amarre.write(60);
     cogerPaqueteSuelo();    
 }
 
@@ -167,4 +172,3 @@ bool writeAngleAndTime( Servo servo, int angle, int time )
     }
     return true;
 }
-
